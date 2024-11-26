@@ -12,7 +12,7 @@ public class DishDto extends BaseResponse {
     private UUID id;
     private String name;
     private String description;
-    private Boolean isAvailable = Boolean.FALSE;
+    private Boolean isAvailable = Boolean.TRUE;
     private FoodCategory foodCategory;
     private Boolean isVeg;
     private Double price;
