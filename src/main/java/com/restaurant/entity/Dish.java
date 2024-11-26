@@ -1,6 +1,9 @@
 package com.restaurant.entity;
 
+import com.restaurant.enums.FoodCategory;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -25,7 +28,8 @@ public class Dish {
     private UUID id;
     private String name;
     private String description;
-    private String category;
+    @Enumerated(EnumType.STRING)
+    private FoodCategory foodCategory;
     private Boolean isVeg;
     private Double price;
 }

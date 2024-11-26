@@ -1,7 +1,10 @@
 package com.restaurant.entity;
 
+import com.restaurant.enums.OrderStatus;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,5 +30,15 @@ public class Order {
     private Dish foodItem;
     private Integer quantity;
     private LocalDate orderedDate;
-    private String status; //order_placed, in_cart
+    private Double price;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus orderStatus;
+    @ManyToOne
+    private User user;
+
+    public Order(Dish foodItem, LocalDate orderedDate, OrderStatus orderStatus) {
+        this.foodItem = foodItem;
+        this.orderedDate = orderedDate;
+        this.orderStatus = orderStatus;
+    }
 }

@@ -1,7 +1,11 @@
 package com.restaurant.entity;
 
+import com.restaurant.enums.UserType;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -14,6 +18,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,10 +32,11 @@ public class User {
     private String name;
     private String mobileNo;
     private String email;
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private UserType role;
     private String password;
     @OneToMany(cascade = CascadeType.ALL)
-    private List<Order> orders;
+    private List<Order> orders = new ArrayList<>();
     @OneToMany(cascade = CascadeType.ALL)
-    private List<Address> addressList;
+    private List<Address> addressList = new ArrayList<>();
 }
