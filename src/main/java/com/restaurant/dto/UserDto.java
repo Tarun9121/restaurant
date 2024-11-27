@@ -1,9 +1,6 @@
 package com.restaurant.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.restaurant.entity.Address;
-import com.restaurant.entity.Order;
-import com.restaurant.enums.UserType;
 import lombok.Data;
 
 import java.util.List;
@@ -20,7 +17,6 @@ public class UserDto extends BaseResponse {
     private String password;
     private List<OrderDto> orders;
     private List<AddressDto> addressList;
-
 }
 
 //{

@@ -1,4 +1,4 @@
-package com.restaurant.config;
+package com.restaurant.implementation;
 
 import com.restaurant.entity.UserPrincipal;
 import com.restaurant.repository.UserRepository;

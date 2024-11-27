@@ -1,6 +1,7 @@
 package com.restaurant.config;
 
 import com.restaurant.enums.UserType;
+import com.restaurant.implementation.RestaurantUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,9 +10,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -27,7 +26,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/customer/users/register").permitAll()
+                        .requestMatchers("/customer/users/register", "/validate/**").permitAll()
                         .requestMatchers("/restaurant/**").hasAuthority(UserType.ADMIN.toString())
                         .requestMatchers("/customer/**").hasAnyAuthority(UserType.CUSTOMER.toString(), UserType.ADMIN.toString())
                         .anyRequest().authenticated()
