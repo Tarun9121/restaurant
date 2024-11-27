@@ -19,14 +19,14 @@ import java.sql.Types;
 import java.time.LocalDate;
 import java.util.UUID;
 
-@Entity @Table(name="orders")
+@Entity @Table(name="cart")
 @Data @NoArgsConstructor @AllArgsConstructor
-public class Order {
+public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @JdbcTypeCode(Types.VARCHAR)
     private UUID id;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade =  { CascadeType.MERGE })
     private Dish foodItem;
     private Integer quantity;
     private LocalDate orderedDate;
@@ -36,7 +36,7 @@ public class Order {
     @ManyToOne
     private User user;
 
-    public Order(Dish foodItem, LocalDate orderedDate, OrderStatus orderStatus) {
+    public Cart(Dish foodItem, LocalDate orderedDate, OrderStatus orderStatus) {
         this.foodItem = foodItem;
         this.orderedDate = orderedDate;
         this.orderStatus = orderStatus;

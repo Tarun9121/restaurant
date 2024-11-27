@@ -15,7 +15,7 @@ public class UserDto extends BaseResponse {
     private String role;
     @JsonProperty(access= JsonProperty.Access.WRITE_ONLY)
     private String password;
-    private List<OrderDto> orders;
+    private List<CartDto> orders;
     private List<AddressDto> addressList;
 }
 

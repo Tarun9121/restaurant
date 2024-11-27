@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -23,25 +23,24 @@ public class AuthServiceImpl implements AuthService {
     private UserRepository userRepository;
     @Autowired
     private UserConvert userConvert;
-    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(10);
+//    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(10);
 
     @Override
     public ResponseEntity<UserDto> validateLogin(LoginDto loginDto) {
         try {
-            log.info("{}", encoder.encode(loginDto.getPassword()));
             User user = userRepository.findByMobileNo(loginDto.getMobileNo());
 
             if(ObjectUtils.isEmpty(user)) {
                 throw new ApiException(Restaurant.USER_NOT_FOUND);
             }
 
-            if(encoder.matches(loginDto.getPassword(), user.getPassword())) {
+            if(user.getPassword().equals(loginDto.getPassword())) {
                 UserDto userDto = userConvert.convert(user);
                 return ResponseEntity.status(HttpStatus.OK).body(userDto);
             } else {
                 UserDto userDto = new UserDto();
                 userDto.setMessage("wrong password");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(userDto);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(userDto);
             }
 
         } catch(Exception e) {
@@ -52,3 +51,31 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 }
+
+//    @Override
+//    public ResponseEntity<UserDto> validateLogin(LoginDto loginDto) {
+//        try {
+//            log.info("{}", encoder.encode(loginDto.getPassword()));
+//            User user = userRepository.findByMobileNo(loginDto.getMobileNo());
+//
+//            if(ObjectUtils.isEmpty(user)) {
+//                throw new ApiException(Restaurant.USER_NOT_FOUND);
+//            }
+//
+//            if(encoder.matches(loginDto.getPassword(), user.getPassword())) {
+//                UserDto userDto = userConvert.convert(user);
+//                return ResponseEntity.status(HttpStatus.OK).body(userDto);
+//            } else {
+//                UserDto userDto = new UserDto();
+//                userDto.setMessage("wrong password");
+//                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(userDto);
+//            }
+//
+//        } catch(Exception e) {
+//            log.info("Exception: {}", e.getMessage());
+//            UserDto userDto = new UserDto();
+//            userDto.setMessage(e.getMessage());
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(userDto);
+//        }
+//    }
+

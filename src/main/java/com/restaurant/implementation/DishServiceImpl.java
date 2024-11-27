@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -76,6 +77,16 @@ public class DishServiceImpl implements DishService {
             return ResponseEntity.status(HttpStatus.OK).body(allDishesDto);
         } catch (Exception e) {
             log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+    @Override
+    public ResponseEntity<List<FoodCategory>> getCategories() {
+        try {
+            List<FoodCategory> allCategories = Arrays.asList(FoodCategory.class.getEnumConstants());
+            return ResponseEntity.status(HttpStatus.OK).body(allCategories);
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }

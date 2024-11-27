@@ -2,9 +2,9 @@ package com.restaurant.implementation;
 
 import com.restaurant.constants.Restaurant;
 import com.restaurant.convert.OrderConvert;
-import com.restaurant.dto.OrderDto;
+import com.restaurant.dto.CartDto;
 import com.restaurant.entity.Dish;
-import com.restaurant.entity.Order;
+import com.restaurant.entity.Cart;
 import com.restaurant.entity.User;
 import com.restaurant.enums.FoodCategory;
 import com.restaurant.enums.OrderStatus;
@@ -42,10 +42,10 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ResponseEntity<List<OrderDto>> viewCart(UUID userId) {
+    public ResponseEntity<List<CartDto>> viewCart(UUID userId) {
         try {
-            List<Order> cartItems = orderRepository.findByUser_IdAndOrderStatus(userId, "in_cart");
-            List<OrderDto> cartDto = cartItems.stream().map(orderConvert::convert).collect(Collectors.toList());
+            List<Cart> cartItems = orderRepository.findByUser_IdAndOrderStatus(userId, OrderStatus.IN_CART);
+            List<CartDto> cartDto = cartItems.stream().map(orderConvert::convert).collect(Collectors.toList());
             return ResponseEntity.status(HttpStatus.OK).body(cartDto);
         } catch (Exception ex) {
             log.error("Error while fetching cart items for user ID {}: {}", userId, ex.getMessage());
@@ -54,13 +54,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ResponseEntity<List<Order>> orderFood(UUID userId) {
+    public ResponseEntity<List<Cart>> orderFood(UUID userId) {
         try {
-            List<Order> cartItems = orderRepository.findByUser_IdAndOrderStatus(userId, "in_cart");
+            List<Cart> cartItems = orderRepository.findByUser_IdAndOrderStatus(userId, OrderStatus.IN_CART);
 
             cartItems.forEach(item -> item.setOrderStatus(OrderStatus.ORDER_PLACED));
 
-            List<Order> orderdItems = orderRepository.saveAll(cartItems);
+            List<Cart> orderdItems = orderRepository.saveAll(cartItems);
 
             return ResponseEntity.status(HttpStatus.OK).body(orderdItems);
 
@@ -71,10 +71,10 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ResponseEntity<List<OrderDto>> viewOrders(UUID userId) {
+    public ResponseEntity<List<CartDto>> viewOrders(UUID userId) {
         try {
-            List<Order> orders = orderRepository.findByUser_IdAndOrderStatus(userId, "order_placed");
-            List<OrderDto> ordersDto = orders.stream().map(orderConvert::convert).collect(Collectors.toList());
+            List<Cart> carts = orderRepository.findByUser_IdAndOrderStatus(userId, OrderStatus.ORDER_PLACED);
+            List<CartDto> ordersDto = carts.stream().map(orderConvert::convert).collect(Collectors.toList());
             return ResponseEntity.status(HttpStatus.OK).body(ordersDto);
         } catch (Exception ex) {
             log.error("Error while fetching orders for user ID {}: {}", userId, ex.getMessage());
@@ -85,21 +85,21 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public ResponseEntity<String> removeFromCart(UUID userId, UUID orderId) {
         try {
-            // Find the user
+            
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new ApiException("User not found with ID: " + userId));
-            // Find the order in the user's cart
-            Order order = orderRepository.findById(orderId)
+
+            Cart cart = orderRepository.findById(orderId)
                     .orElseThrow(() -> new ApiException("Order not found with ID: " + orderId));
-            // Ensure the order belongs to the user and is in cart status
-            if (!order.getUser().getId().equals(userId)) {
+
+            if (!cart.getUser().getId().equals(userId)) {
                 throw new ApiException("Specified food item is not in your cart");
             }
-            if(!OrderStatus.IN_CART.equals(order.getOrderStatus())) {
+            if(!OrderStatus.IN_CART.equals(cart.getOrderStatus())) {
                 throw new ApiException("Order is placed and cannot be removed");
             }
-            // Remove the order
-            orderRepository.delete(order);
+
+            orderRepository.delete(cart);
             return ResponseEntity.status(HttpStatus.OK).body("Item removed from cart successfully");
         } catch (ApiException ex) {
             log.error("Error while removing item from cart: {}", ex.getMessage());
@@ -112,7 +112,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ResponseEntity<OrderDto> addToCart(UUID userId, UUID dishId, Integer quantity) {
+    public ResponseEntity<CartDto> addToCart(UUID userId, UUID dishId, Integer quantity) {
         try {
             Dish dish = dishRepository.findById(dishId)
                     .orElseThrow(() -> new ApiException("Dish not found with ID: " + dishId));
@@ -124,19 +124,19 @@ public class OrderServiceImpl implements OrderService {
                 throw new ApiException("Quantity must be greater than zero");
             }
 
-            Order order = new Order();
-            order.setUser(user);
-            order.setFoodItem(dish);
-            order.setQuantity(quantity);
-            order.setOrderedDate(LocalDate.now());
-            order.setPrice(dish.getPrice());
-            order.setOrderStatus(OrderStatus.IN_CART);
+            Cart cart = new Cart();
+            cart.setUser(user);
+            cart.setFoodItem(dish);
+            cart.setQuantity(quantity);
+            cart.setOrderedDate(LocalDate.now());
+            cart.setPrice(dish.getPrice() * quantity);
+            cart.setOrderStatus(OrderStatus.IN_CART);
 
-            Order savedOrder = orderRepository.save(order);
-            OrderDto savedOrderDto = orderConvert.convert(savedOrder);
-            savedOrderDto.setMessage(Restaurant.DISH_ADDED_SUCCESSFULLY);
+            Cart savedCart = orderRepository.save(cart);
+            CartDto savedCartDto = orderConvert.convert(savedCart);
+            savedCartDto.setMessage(Restaurant.DISH_ADDED_SUCCESSFULLY);
 
-            return ResponseEntity.status(HttpStatus.OK).body(savedOrderDto);
+            return ResponseEntity.status(HttpStatus.OK).body(savedCartDto);
         } catch (ApiException ex) {
             log.error("Error while adding item to cart: {}", ex.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -147,14 +147,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ResponseEntity<List<OrderDto>> getAllFoodItems(String sortBy) {
+    public ResponseEntity<List<CartDto>> getAllFoodItems(String sortBy) {
         try {
             List<Dish> foodItems = sortBy.equalsIgnoreCase("high to low")
                     ? dishRepository.findAll(Sort.by(Sort.Direction.DESC, "price"))
                     : dishRepository.findAll(Sort.by(Sort.Direction.ASC, "price"));
 
-            List<OrderDto> foodItemDtos = foodItems.stream()
-                    .map(dish -> orderConvert.convert(new Order(dish, LocalDate.now(), OrderStatus.IN_CART)))
+            List<CartDto> foodItemDtos = foodItems.stream()
+                    .map(dish -> orderConvert.convert(new Cart(dish, LocalDate.now(), OrderStatus.IN_CART)))
                     .collect(Collectors.toList());
 
             return ResponseEntity.status(HttpStatus.OK).body(foodItemDtos);
@@ -165,7 +165,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ResponseEntity<List<OrderDto>> searchFood(String foodName, Boolean foodType, String sortBy) {
+    public ResponseEntity<List<CartDto>> searchFood(String foodName, Boolean foodType, String sortBy) {
         try {
             List<Dish> foodItems = foodType != null
                     ? sortBy.equalsIgnoreCase("high to low")
@@ -173,8 +173,8 @@ public class OrderServiceImpl implements OrderService {
                     : dishRepository.getAllDishesByNameAndIsVegAsc(foodName)
                     : dishRepository.getAllDishesByName(foodName);
 
-            List<OrderDto> foodItemDtos = foodItems.stream()
-                    .map(dish -> orderConvert.convert(new Order(dish, LocalDate.now(), OrderStatus.IN_CART)))
+            List<CartDto> foodItemDtos = foodItems.stream()
+                    .map(dish -> orderConvert.convert(new Cart(dish, LocalDate.now(), OrderStatus.IN_CART)))
                     .collect(Collectors.toList());
 
             return ResponseEntity.status(HttpStatus.OK).body(foodItemDtos);
@@ -185,7 +185,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ResponseEntity<List<OrderDto>> getFoodByCategory(String category, Boolean foodType, String sortBy) {
+    public ResponseEntity<List<CartDto>> getFoodByCategory(String category, Boolean foodType, String sortBy) {
         try {
             List<Dish> foodItems;
             FoodCategory foodCategory = FoodCategory.valueOf(category.toUpperCase());
@@ -198,8 +198,8 @@ public class OrderServiceImpl implements OrderService {
                 foodItems = dishRepository.findByFoodCategory(category);
             }
 
-            List<OrderDto> foodItemDtos = foodItems.stream()
-                    .map(dish -> orderConvert.convert(new Order(dish, LocalDate.now(), OrderStatus.IN_CART)))
+            List<CartDto> foodItemDtos = foodItems.stream()
+                    .map(dish -> orderConvert.convert(new Cart(dish, LocalDate.now(), OrderStatus.IN_CART)))
                     .collect(Collectors.toList());
 
             return ResponseEntity.status(HttpStatus.OK).body(foodItemDtos);
@@ -210,26 +210,26 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ResponseEntity<OrderDto> updateOrder(UUID userId, UUID dishId, Integer quantity) {
+    public ResponseEntity<CartDto> updateOrder(UUID userId, UUID dishId, Integer quantity) {
         try {
-            Optional<Order> existingOrder = orderRepository.getCurrentOrder(userId, dishId);
+            Optional<Cart> existingOrder = orderRepository.getCurrentOrder(userId, dishId);
             Dish dish = dishRepository.findById(dishId).orElseThrow(() -> new ApiException(Restaurant.DISH_NOT_FOUND));
 
             if(existingOrder.isPresent()) {
-                Order currentOrder = orderRepository.findById(existingOrder.get().getId()).orElseThrow();
-                currentOrder.setQuantity(quantity);
-                currentOrder.setPrice(quantity * dish.getPrice());
-                Order updatedOrder = orderRepository.save(currentOrder);
-                OrderDto updatedOrderDto = orderConvert.convert(updatedOrder);
+                Cart currentCart = orderRepository.findById(existingOrder.get().getId()).orElseThrow();
+                currentCart.setQuantity(quantity);
+                currentCart.setPrice(quantity * dish.getPrice());
+                Cart updatedCart = orderRepository.save(currentCart);
+                CartDto updatedCartDto = orderConvert.convert(updatedCart);
 
-                updatedOrderDto.setMessage(Restaurant.DISH_UPDTED_SUCCESSFULLY);
-                return ResponseEntity.status(HttpStatus.OK).body(updatedOrderDto);
+                updatedCartDto.setMessage(Restaurant.DISH_UPDTED_SUCCESSFULLY);
+                return ResponseEntity.status(HttpStatus.OK).body(updatedCartDto);
             }
             else {
                 return addToCart(userId, dishId, quantity);
             }
         } catch (Exception e) {
-            OrderDto error = new OrderDto();
+            CartDto error = new CartDto();
 
             error.setStatus(HttpStatus.BAD_REQUEST);
             error.setMessage(e.getMessage());

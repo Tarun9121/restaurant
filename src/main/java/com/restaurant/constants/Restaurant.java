@@ -11,4 +11,5 @@ public class Restaurant {
     public static final String DISH_ADDED_SUCCESSFULLY = "Dish added successfully";
     public static final String DISH_UPDTED_SUCCESSFULLY = "quantity updated successfully";
     public static final String USERNAME_NOT_MATCH = "Username does not exist";
+    public static final String ACCOUNT_ALREADY_EXIST = "Account already exist with your mobile no";
 }

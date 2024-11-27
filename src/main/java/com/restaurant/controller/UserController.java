@@ -12,6 +12,8 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/customer/users")
+@CrossOrigin(origins = "http://localhost:5173/")
+
 @Tag(name = "User Controller", description = "Operations related to user management")
 public class UserController {
 
@@ -24,24 +26,29 @@ public class UserController {
     @PostMapping("/register")
     @Operation(summary = "Register User", description = "Registers a new user and returns the created user details.")
     public ResponseEntity<UserDto> registerUser(@RequestBody UserDto userDto) {
-        return ResponseEntity.ok(userService.registerUser(userDto));
+        return userService.registerUser(userDto);
     }
 
+    @PatchMapping("/{userId}/update")
+    @Operation(summary = "Update User", description = "Updates specific fields of the user profile.")
+    public ResponseEntity<UserDto> updateUser(@PathVariable UUID userId, @RequestBody UserDto userDto) {
+        return userService.updateUser(userId, userDto);
+    }
     @PostMapping("/{userId}/add-address")
     @Operation(summary = "Add Address", description = "Adds a new address to an existing user by user ID.")
     public ResponseEntity<UserDto> addAddress(@PathVariable UUID userId, @RequestBody AddressDto addressDto) {
-        return ResponseEntity.ok(userService.addAddress(userId, addressDto));
+        return userService.addAddress(userId, addressDto);
     }
 
     @PutMapping("/{userId}/edit")
     @Operation(summary = "Edit Profile", description = "Updates user details, including addresses, by user ID.")
     public ResponseEntity<UserDto> editProfile(@PathVariable UUID userId, @RequestBody UserDto userDto) {
-        return ResponseEntity.ok(userService.editProfile(userId, userDto));
+        return userService.editProfile(userId, userDto);
     }
 
     @GetMapping("/{userId}/profile")
     @Operation(summary = "Get Profile", description = "Fetches the profile of a user by user ID.")
     public ResponseEntity<UserDto> getProfile(@PathVariable UUID userId) {
-        return ResponseEntity.ok(userService.getProfile(userId));
+        return userService.getProfile(userId);
     }
 }

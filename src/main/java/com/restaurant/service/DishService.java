@@ -15,4 +15,5 @@ public interface DishService {
     ResponseEntity<String> removeDish(UUID dishId);
     ResponseEntity<List<DishDto>> getAllDishes(FoodCategory foodCategory, String foodName, Boolean isVeg, boolean sortByAsc);
     ResponseEntity<List<DishDto>> getAllAvailableDishes();
+    ResponseEntity<List<FoodCategory>> getCategories();
 }

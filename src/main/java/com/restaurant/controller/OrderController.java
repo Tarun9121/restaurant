@@ -1,7 +1,7 @@
 package com.restaurant.controller;
 
-import com.restaurant.dto.OrderDto;
-import com.restaurant.entity.Order;
+import com.restaurant.dto.CartDto;
+import com.restaurant.entity.Cart;
 import com.restaurant.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,7 +28,7 @@ public class OrderController {
             summary = "Get All Food Items",
             description = "Fetch all food items with sorting (high to low or low to high price)."
     )
-    public ResponseEntity<List<OrderDto>> getAllFoodItems(
+    public ResponseEntity<List<CartDto>> getAllFoodItems(
             @RequestParam(required = false, defaultValue = "low to high") String sortBy) {
         return orderService.getAllFoodItems(sortBy);
     }
@@ -38,7 +38,7 @@ public class OrderController {
             summary = "Search Food",
             description = "Search food by name, type (veg or non-veg), and sorting (low to high or high to low price)."
     )
-    public ResponseEntity<List<OrderDto>> searchFood(
+    public ResponseEntity<List<CartDto>> searchFood(
             @PathVariable String foodName,
             @RequestParam(required = false) Boolean foodType, // true = veg, false = non-veg
             @RequestParam(required = false, defaultValue = "low to high") String sortBy) {
@@ -62,12 +62,12 @@ public class OrderController {
             summary = "View Cart",
             description = "View the cart for a specific user by user ID."
     )
-    public ResponseEntity<List<OrderDto>> viewCart(@PathVariable UUID userId) {
+    public ResponseEntity<List<CartDto>> viewCart(@PathVariable UUID userId) {
         return orderService.viewCart(userId);
     }
 
     @PutMapping("/order-food/{userId}")
-    public ResponseEntity<List<Order>> orderFood(@PathVariable("userId") UUID userId) {
+    public ResponseEntity<List<Cart>> orderFood(@PathVariable("userId") UUID userId) {
         return orderService.orderFood(userId);
     }
 
@@ -76,7 +76,7 @@ public class OrderController {
             summary = "View Placed Orders",
             description = "View the placed orders for a specific user by user ID."
     )
-    public ResponseEntity<List<OrderDto>> viewOrders(@PathVariable UUID userId) {
+    public ResponseEntity<List<CartDto>> viewOrders(@PathVariable UUID userId) {
         return orderService.viewOrders(userId);
     }
 
@@ -85,7 +85,7 @@ public class OrderController {
             summary = "Add Items to Cart",
             description = "Add items to the cart for a specific user by user ID and dish ID, with the specified quantity."
     )
-    public ResponseEntity<OrderDto> addToCart(
+    public ResponseEntity<CartDto> addToCart(
             @PathVariable UUID userId,
             @PathVariable UUID dishId,
             @RequestParam Integer quantity) {
@@ -93,7 +93,7 @@ public class OrderController {
     }
 
     @PutMapping("/update-quantity/{userId}/{dishId}")
-    public ResponseEntity<OrderDto> updateQuantity(
+    public ResponseEntity<CartDto> updateQuantity(
             @PathVariable UUID userId,
             @PathVariable UUID dishId,
             @RequestParam Integer quantity

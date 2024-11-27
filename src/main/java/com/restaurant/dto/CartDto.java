@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @Data @NoArgsConstructor @AllArgsConstructor
-public class OrderDto extends BaseResponse{
+public class CartDto extends BaseResponse{
     private UUID id;
     private DishDto foodItem;
     private Integer quantity;

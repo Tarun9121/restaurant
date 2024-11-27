@@ -34,4 +34,9 @@ public class DishController {
     public ResponseEntity<List<DishDto>> getAllDishes() {
         return dishService.getAllAvailableDishes();
     }
+
+    @GetMapping("/get-categories")
+    public ResponseEntity<List<FoodCategory>> getCategories() {
+        return dishService.getCategories();
+    }
 }
