@@ -2,7 +2,7 @@ package com.restaurant.controller;
 
 import com.restaurant.dto.CartDto;
 import com.restaurant.entity.Cart;
-import com.restaurant.service.OrderService;
+import com.restaurant.service.CartService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
@@ -15,12 +15,12 @@ import java.util.UUID;
 @RequestMapping("/customer/orders")
 @Tag(name = "Order Controller", description = "Operations related to orders and cart management")
 @CrossOrigin
-public class OrderController {
+public class CartController {
 
-    private final OrderService orderService;
+    private final CartService cartService;
 
-    public OrderController(OrderService orderService) {
-        this.orderService = orderService;
+    public CartController(CartService cartService) {
+        this.cartService = cartService;
     }
 
     @GetMapping("/all-food-items")
@@ -30,7 +30,7 @@ public class OrderController {
     )
     public ResponseEntity<List<CartDto>> getAllFoodItems(
             @RequestParam(required = false, defaultValue = "low to high") String sortBy) {
-        return orderService.getAllFoodItems(sortBy);
+        return cartService.getAllFoodItems(sortBy);
     }
 
     @GetMapping("/food-search/{foodName}")
@@ -42,7 +42,7 @@ public class OrderController {
             @PathVariable String foodName,
             @RequestParam(required = false) Boolean foodType, // true = veg, false = non-veg
             @RequestParam(required = false, defaultValue = "low to high") String sortBy) {
-        return orderService.searchFood(foodName, foodType, sortBy);
+        return cartService.searchFood(foodName, foodType, sortBy);
     }
 
 //    @GetMapping("/food-category/{category}")
@@ -63,12 +63,12 @@ public class OrderController {
             description = "View the cart for a specific user by user ID."
     )
     public ResponseEntity<List<CartDto>> viewCart(@PathVariable UUID userId) {
-        return orderService.viewCart(userId);
+        return cartService.viewCart(userId);
     }
 
     @PutMapping("/order-food/{userId}")
     public ResponseEntity<List<Cart>> orderFood(@PathVariable("userId") UUID userId) {
-        return orderService.orderFood(userId);
+        return cartService.orderFood(userId);
     }
 
     @GetMapping("/view-orders/{userId}")
@@ -77,7 +77,7 @@ public class OrderController {
             description = "View the placed orders for a specific user by user ID."
     )
     public ResponseEntity<List<CartDto>> viewOrders(@PathVariable UUID userId) {
-        return orderService.viewOrders(userId);
+        return cartService.viewOrders(userId);
     }
 
     @PostMapping("/add-to-cart/{userId}/{dishId}")
@@ -89,7 +89,7 @@ public class OrderController {
             @PathVariable UUID userId,
             @PathVariable UUID dishId,
             @RequestParam Integer quantity) {
-        return orderService.addToCart(userId, dishId, quantity);
+        return cartService.addToCart(userId, dishId, quantity);
     }
 
     @PutMapping("/update-quantity/{userId}/{dishId}")
@@ -98,12 +98,12 @@ public class OrderController {
             @PathVariable UUID dishId,
             @RequestParam Integer quantity
     ) {
-        return orderService.updateOrder(userId, dishId, quantity);
+        return cartService.updateOrder(userId, dishId, quantity);
     }
 
     @DeleteMapping("/remove-from-cart/{userId}/{orderId}")
     @Operation(summary = "Remove Item from Cart", description = "Removes a specific item from the user's cart.")
     public ResponseEntity<String> removeFromCart(@PathVariable UUID userId, @PathVariable UUID orderId) {
-        return orderService.removeFromCart(userId, orderId);
+        return cartService.removeFromCart(userId, orderId);
     }
 }

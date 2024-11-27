@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 import java.util.UUID;
 
-public interface OrderService {
+public interface CartService {
     ResponseEntity<List<CartDto>> viewCart(UUID userId);
 
     ResponseEntity<List<CartDto>> viewOrders(UUID userId);

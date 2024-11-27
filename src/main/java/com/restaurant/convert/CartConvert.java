@@ -7,11 +7,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
 @Component
-public class OrderConvert {
+public class CartConvert {
 
     private final DishConvert dishConvert;
 
-    public OrderConvert(DishConvert dishConvert) {
+    public CartConvert(DishConvert dishConvert) {
         this.dishConvert = dishConvert;
     }
 
