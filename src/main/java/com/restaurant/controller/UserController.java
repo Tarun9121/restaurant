@@ -44,4 +44,10 @@ public class UserController {
     public ResponseEntity<UserDto> getProfile(@PathVariable UUID userId) {
         return ResponseEntity.ok(userService.getProfile(userId));
     }
+
+    @PatchMapping("/{userId}/update")
+    @Operation(summary = "Update User", description = "Updates specific fields of the user profile.")
+    public ResponseEntity<UserDto> updateUser(@PathVariable UUID userId, @RequestBody UserDto userDto) {
+        return userService.updateUser(userId, userDto);
+    }
 }
